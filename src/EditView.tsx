@@ -4,11 +4,15 @@ import * as ReactDOM from "react-dom";
 import { EditComponent } from "./EditComponent";
 
 export const VIEW_TYPE_EDIT = "edit-view";
+const PLUGIN_PATH = '/plugins/obsidian-diagrams-net';
+
 
 export class EditView extends ItemView {
   constructor(leaf: WorkspaceLeaf) {
     super(leaf);
   }
+
+
 
   getViewType() {
     return VIEW_TYPE_EDIT;
@@ -19,14 +23,24 @@ export class EditView extends ItemView {
   }
 
   async onOpen() {
+
+    // console.log('this', await this.loadData())
+    const configPath = this.app.vault.configDir + PLUGIN_PATH + '/editPath';
+    const editPath = await this.app.vault.adapter.read(configPath);
     const container = this.containerEl.children[1];
+
     ReactDOM.render(
-      <EditComponent app={this.app} close={this.onClose} />,
+      <EditComponent
+        app={this.app}
+        close={this.onClose}
+        editPath={editPath} />,
       container
     );
   }
 
   async onClose() {
+    // const configPath = this.app.vault.configDir + PLUGIN_PATH + '/editPath';
+    // await this.app.vault.adapter.write(configPath, '');
     ReactDOM.unmountComponentAtNode(this.containerEl.children[1]);
   }
 }

@@ -1,60 +1,70 @@
 import * as React from "react";
 import useDiagramsNet from './useDiagramsNet';
+import { TFile } from 'obsidian';
 
 
 export const EditComponent = (props: any) => {
 
-    const { 
+    const {
         app,
-        close,
+        editPath,
     } = props
 
-    const onSave = async (msg: any) => {
-        console.group('SAVE!')
-        const path = await app.vault.getAvailablePathForAttachments('Diagram', 'svg')
+    const [svgFile, setSvgFile] = React.useState(null)
+    const [xmlFile, setXmlFile] = React.useState(null)
+    const [xmlData, setXmlData] = React.useState(null)
 
-        console.log('path', path)
-        console.log('msg', msg)
+
+    const onSave = async (msg: any) => {
 
         const svgData = msg.svgMsg.data
         const svgBuffer = Buffer.from(svgData.replace('data:image/svg+xml;base64,', ''), 'base64')
-        
-        app.vault.createBinary(
-            path,
+
+        app.vault.modifyBinary(
+            svgFile,
             svgBuffer,
+        )
 
-            )
-
-
-        console.groupEnd()
+        app.vault.modify(
+            xmlFile,
+            msg.svgMsg.xml,
+        )
     }
+
 
     const { startEditing } = useDiagramsNet(
         onSave,
         () => () => { },
         () => "",
-        () => "")
+        () => xmlData
+    )
 
 
-    const files = app.vault.getMarkdownFiles()
-    for (let i = 0; i < files.length; i++) { console.log(files[i].path); }
+    const loadOldData = async () => {
+        const absFile = app.vault.getAbstractFileByPath(editPath)
+        if (absFile instanceof TFile && absFile.extension === 'svg') {
+            const shadow = app.vault.getAbstractFileByPath(editPath + '.xml')
+            if (shadow && shadow instanceof TFile && shadow.extension === 'xml') {
+                const data = await app.vault.read(shadow)
+                setXmlData(data)
+                setSvgFile(absFile)
+                setXmlFile(shadow)
+            }
+        }
+    }
 
-    
-    // console.log('a', app)
 
-    console.group('EditComponent')
+    React.useEffect(() => {
+        if (!xmlData) {
+            loadOldData()
+        }
+        else if (xmlData) {
+            startEditing()
+        }
 
-    console.groupEnd()
+    }, [xmlData])
 
-    return <div>
-        Noth.
-        <button onClick={close}>close</button>
-    </div>
 
-    return <div id="rooty">
-        <h4>Hello, ReactY1!</h4>
-        <button onClick={startEditing}>Start</button>
-        <div id="drawIoDiagramFrame" />
-    </div>
+    return <div id="drawIoDiagramFrame" />
 
 };

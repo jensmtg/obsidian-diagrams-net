@@ -5,6 +5,8 @@ import { ReactView } from "./src/ReactView";
 import { NewView, VIEW_TYPE_NEW } from "./src/NewView";
 import { EditView, VIEW_TYPE_EDIT } from "./src/EditView";
 
+const PLUGIN_PATH = '/plugins/obsidian-diagrams-net';
+
 // Remember to rename these classes and interfaces!
 
 interface MyPluginSettings {
@@ -18,8 +20,11 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
 
+	
 	async onload() {
 		await this.loadSettings();
+
+
 
 		// This creates an icon in the left ribbon.
 		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
@@ -83,6 +88,36 @@ export default class MyPlugin extends Plugin {
 			(leaf) => new EditView(leaf)
 		);
 
+		this.registerEvent(this.app.vault.on('create', (file) => {
+			console.log('a new file has entered the arena', file)
+			if (file instanceof TFile && file.extension === 'svg') {
+				this.closeViews()
+			}
+		}));
+
+		this.registerEvent(this.app.vault.on('rename', (file, oldname) => {
+			if (file instanceof TFile && file.extension === 'svg') {
+				const shadow = this.app.vault.getAbstractFileByPath(oldname + '.xml');
+				if (shadow && shadow instanceof TFile && shadow.extension === 'xml') {
+					const newname = file.path
+					this.app.vault.rename(shadow, newname + '.xml')
+				}
+			}
+		}));
+
+		this.registerEvent(this.app.vault.on('modify', (file) => {
+			console.log('moduff')
+
+			// if (file instanceof TFile && file.extension === 'svg') {
+			// 	const shadow = this.app.vault.getAbstractFileByPath(oldname + '.xml');
+			// 	if (shadow && shadow instanceof TFile && shadow.extension === 'xml') {
+			// 		const newname = file.path
+			// 		this.app.vault.rename(shadow, newname + '.xml')
+			// 	}
+			// }
+
+		}));
+
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new SampleSettingTab(this.app, this));
 
@@ -106,7 +141,8 @@ export default class MyPlugin extends Plugin {
 							.setTitle("Edit diagram!!!")
 							.setIcon("diagram")
 							.onClick(async () => {
-								this.activateEditView();
+								new Notice(file.path);
+								this.activateEditView(file.path);
 							});
 					});
 				}
@@ -130,8 +166,7 @@ export default class MyPlugin extends Plugin {
 	}
 
 	async onunload() {
-		this.app.workspace.detachLeavesOfType(VIEW_TYPE_NEW);
-		this.app.workspace.detachLeavesOfType(VIEW_TYPE_EDIT);
+		this.closeViews()
 	}
 
 	async loadSettings() {
@@ -152,13 +187,22 @@ export default class MyPlugin extends Plugin {
 		this.app.workspace.revealLeaf(this.app.workspace.getLeavesOfType(VIEW_TYPE_NEW)[0]);
 	}
 
-	async activateEditView() {
+	async activateEditView(filePath: string) {
 		this.app.workspace.detachLeavesOfType(VIEW_TYPE_EDIT);
+		const editPath = this.app.vault.configDir + PLUGIN_PATH + '/editPath'
+		await this.app.vault.adapter.write(editPath, filePath);
 		await this.app.workspace.getRightLeaf(false).setViewState({
 			type: VIEW_TYPE_EDIT,
 			active: true,
 		});
 		this.app.workspace.revealLeaf(this.app.workspace.getLeavesOfType(VIEW_TYPE_EDIT)[0]);
+	}
+
+	async closeViews() {
+		this.app.workspace.detachLeavesOfType(VIEW_TYPE_NEW);
+		this.app.workspace.detachLeavesOfType(VIEW_TYPE_EDIT);
+		const editPath = this.app.vault.configDir + PLUGIN_PATH + '/editPath'
+		await this.app.vault.adapter.write(editPath, '');
 	}
 
 }

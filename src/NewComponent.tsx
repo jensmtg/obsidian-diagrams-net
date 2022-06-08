@@ -1,32 +1,41 @@
 import * as React from "react";
 import useDiagramsNet from './useDiagramsNet';
+import { MarkdownView } from "obsidian";
 
 
 export const NewComponent = (props: any) => {
 
-    const { 
+    const {
         app,
         // close,
     } = props
 
-    const onSave = async (msg: any) => {
-        console.group('SAVE!')
-        const path = await app.vault.getAvailablePathForAttachments('Diagram', 'svg')
 
-        console.log('path', path)
-        console.log('msg', msg)
+    const onSave = async (msg: any) => {
+
+        const path = await app.vault.getAvailablePathForAttachments('Diagram', 'svg')
 
         const svgData = msg.svgMsg.data
         const svgBuffer = Buffer.from(svgData.replace('data:image/svg+xml;base64,', ''), 'base64')
-        
+
         app.vault.createBinary(
             path,
             svgBuffer,
+        )
 
-            )
+        app.vault.create(
+            path + '.xml',
+            msg.svgMsg.xml,
+        )
 
+        // Insert reference in active document, at cursor
+        const view = app.workspace.getActiveViewOfType(MarkdownView);
+        if (view) {
+            const cursor = view.editor.getCursor();
+            view.editor.replaceRange(`![[${path}]]`, cursor);
 
-        console.groupEnd()
+        }
+
     }
 
     const { startEditing } = useDiagramsNet(
@@ -36,20 +45,12 @@ export const NewComponent = (props: any) => {
         () => "")
 
 
-    const files = app.vault.getMarkdownFiles()
-    for (let i = 0; i < files.length; i++) { console.log(files[i].path); }
+    React.useEffect(() => {
+        startEditing()
+    }, [])
 
-    
-    // console.log('a', app)
 
-    console.group('NewComponent')
+    return <div id="drawIoDiagramFrame" />
 
-    console.groupEnd()
-
-    return <div id="rooty">
-        <h4>Hello, ReactY1!</h4>
-        <button onClick={startEditing}>Start</button>
-        <div id="drawIoDiagramFrame" />
-    </div>
 
 };
