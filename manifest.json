@@ -3,8 +3,8 @@
 	"name": "Diagrams.net",
 	"version": "1.0.1",
 	"minAppVersion": "0.12.0",
-	"description": "This is a sample plugin for Obsidian. This plugin demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
+	"description": "This is a diagrams.net/draw.io-plugin proof of concept for Obsidian, using an online editor.",
+	"author": "Jens MTG",
+	"authorUrl": "https://github.com/jensmtg",
 	"isDesktopOnly": false
 }

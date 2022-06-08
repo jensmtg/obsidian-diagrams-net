@@ -33,7 +33,6 @@ export const NewComponent = (props: any) => {
         if (view) {
             const cursor = view.editor.getCursor();
             view.editor.replaceRange(`![[${path}]]`, cursor);
-
         }
 
     }

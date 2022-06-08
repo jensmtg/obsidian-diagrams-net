@@ -23,8 +23,6 @@ export class EditView extends ItemView {
   }
 
   async onOpen() {
-
-    // console.log('this', await this.loadData())
     const configPath = this.app.vault.configDir + PLUGIN_PATH + '/editPath';
     const editPath = await this.app.vault.adapter.read(configPath);
     const container = this.containerEl.children[1];
@@ -39,8 +37,6 @@ export class EditView extends ItemView {
   }
 
   async onClose() {
-    // const configPath = this.app.vault.configDir + PLUGIN_PATH + '/editPath';
-    // await this.app.vault.adapter.write(configPath, '');
     ReactDOM.unmountComponentAtNode(this.containerEl.children[1]);
   }
 }

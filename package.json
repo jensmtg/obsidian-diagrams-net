@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-sample-plugin",
+	"name": "obsidian-diagrams-net",
 	"version": "1.0.1",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+	"description": "This is a diagrams.net/draw.io-plugin proof of concept for Obsidian, using an online editor.",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
