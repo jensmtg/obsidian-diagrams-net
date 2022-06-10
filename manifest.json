@@ -3,8 +3,8 @@
 	"name": "Diagrams.net",
 	"version": "1.0.1",
 	"minAppVersion": "0.12.0",
-	"description": "This is a diagrams.net/draw.io-plugin proof of concept for Obsidian, using an online editor.",
-	"author": "Jens MTG",
+	"description": "A plugin for Obsidian for inserting and editing diagrams.net (previously draw.io) diagrams.",
+	"author": "Jens M Gleditsch",
 	"authorUrl": "https://github.com/jensmtg",
 	"isDesktopOnly": false
 }
