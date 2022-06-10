@@ -2,11 +2,9 @@
 
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/jensmtg/obsidian-diagrams-net?style=for-the-badge&sort=semver)
 
-This repository contains a plugin for [Obsidian](https://obsidian.md/) for inserting and editing [diagrams.net](https://diagrams.net/) (previously draw.io) diagrams. It differs from the [drawio-obsidian](https://github.com/zapthedingbat/drawio-obsidian) plugin by using the embedded online editor, which requires an active internet connection. On the other hand, it provides the complete feature set.
+This repository contains a plugin for [Obsidian](https://obsidian.md/) for inserting and editing [diagrams.net](https://diagrams.net/) (previously draw.io) diagrams. It differs from the [drawio-obsidian](https://github.com/zapthedingbat/drawio-obsidian) plugin by embedding the official online editor, which requires an active internet connection, but enables the full feature set and all the shape libraries.
 
 ![Screencapture](demo.gif)
-
-This is a diagrams.net/draw.io-plugin proof of concept for Obsidian, using an online editor. Expect glitches.
 
 
 > ## ⚠️ **Caveats**
