@@ -177,9 +177,13 @@ function useDiagramsNet(onSaveCallback, onStopEditing, getName, getData) {
 
     function stopEditing() {
         onStopEditing()
-        console.log('stopEditing')
-        ReactDOM.render(<div id={frameId} />, document.getElementById(frameId));
-        window.removeEventListener('message', _handleMessageEvent)
+        try {
+            ReactDOM.render(<div id={frameId} />, document.getElementById(frameId));
+            window.removeEventListener('message', _handleMessageEvent)
+        }
+        catch {
+            // DOM node gone
+        }
     }
 
     return {

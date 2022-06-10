@@ -55,13 +55,14 @@ export default class DiagramsNet extends Plugin {
 	}
 
 	isFileValidDiagram(file: TAbstractFile) {
+		let itIs = false
 		if (file instanceof TFile && file.extension === 'svg') {
 			const xmlFile = this.app.vault.getAbstractFileByPath(this.getXmlPath(file.path));
 			if (xmlFile && xmlFile instanceof TFile && xmlFile.extension === 'xml') {
-				return true
+				itIs = true
 			}
 		}
-		return false
+		return itIs
 	}
 
 	getXmlPath(path: string) {
@@ -133,10 +134,11 @@ export default class DiagramsNet extends Plugin {
 	}
 
 	handleRenameFile(file: TAbstractFile, oldname: string) {
-		if (this.isFileValidDiagram(file)) {
-			const xmlFile = this.app.vault.getAbstractFileByPath(this.getXmlPath(file.path));
-			this.vault.delete(xmlFile)
-			this.vault.rename(xmlFile, this.getXmlPath(file.path))
+		if (file instanceof TFile && file.extension === 'svg') {
+			const xmlFile = this.app.vault.getAbstractFileByPath(this.getXmlPath(oldname));
+			if (xmlFile && xmlFile instanceof TFile && xmlFile.extension === 'xml') {
+				this.vault.rename(xmlFile, this.getXmlPath(file.path))
+			}
 		}
 	}
 

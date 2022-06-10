@@ -24,7 +24,7 @@ export default class DiagramsView extends ItemView {
     }
 
     constructor(leaf: WorkspaceLeaf, hostView: View,
-        initialFileInfo: { path: string, basename: string, svgPath: string, xmlPath: string, diagramExists: boolean } ) {
+        initialFileInfo: { path: string, basename: string, svgPath: string, xmlPath: string, diagramExists: boolean }) {
         super(leaf);
         this.filePath = initialFileInfo.path;
         this.fileName = initialFileInfo.basename;
@@ -58,7 +58,7 @@ export default class DiagramsView extends ItemView {
             }
         }
 
-        const close = () => {   
+        const close = () => {
             this.workspace.detachLeavesOfType(DIAGRAM_VIEW_TYPE);
         }
 
@@ -71,11 +71,11 @@ export default class DiagramsView extends ItemView {
                 if (!(svgFile instanceof TFile && xmlFile instanceof TFile)) {
                     return
                 }
-                this.vault.modifyBinary(svgFile, svgBuffer )
+                this.vault.modifyBinary(svgFile, svgBuffer)
                 this.vault.modify(xmlFile, msg.svgMsg.xml)
             }
             else {
-                this.vault.createBinary(this.svgPath, svgBuffer )
+                this.vault.createBinary(this.svgPath, svgBuffer)
                 this.vault.create(this.xmlPath, msg.svgMsg.xml)
             }
         }
@@ -107,7 +107,7 @@ export default class DiagramsView extends ItemView {
     }
 
     async onClose() {
-            ReactDOM.unmountComponentAtNode(this.containerEl.children[1]);
+        ReactDOM.unmountComponentAtNode(this.containerEl.children[1]);
     }
 
 }
