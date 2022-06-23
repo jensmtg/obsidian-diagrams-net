@@ -24,7 +24,7 @@ export const DiagramsApp = (props: any) => {
 
     const loadXmlData = async () => {
         const xmlFile = vault.getAbstractFileByPath(xmlPath)
-        const data = await vault.read(xmlFile)
+        const data = await vault.cachedRead(xmlFile)
         setXmlData(data)
     }
 

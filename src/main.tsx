@@ -33,7 +33,16 @@ export default class DiagramsNet extends Plugin {
 		this.addCommand({
 			id: 'app:diagrams-net-new-diagram',
 			name: 'New diagram',
-			callback: () => this.attemptNewDiagram(),
+			checkCallback: (checking: boolean) => {
+				const leaf = this.app.workspace.activeLeaf;
+				if (leaf) {
+					if (!checking) {
+						this.attemptNewDiagram()
+					}
+					return true;
+				}
+				return false;
+			},
 			hotkeys: []
 		});
 
@@ -121,9 +130,11 @@ export default class DiagramsNet extends Plugin {
 			return
 		}
 		const hostView = this.workspace.getActiveViewOfType(MarkdownView);
-		const preview = this.app.workspace.splitActiveLeaf('horizontal')
-		const mmPreview = new DiagramsView(preview, hostView, fileInfo)
-		preview.open(mmPreview)
+		const leaf = this.app.workspace.splitActiveLeaf('horizontal')
+		// const leaf = this.app.workspace.getLeaf(true, 'horizontal')
+
+		const diagramView = new DiagramsView(leaf, hostView, fileInfo)
+		leaf.open(diagramView)
 	}
 
 	handleDeleteFile(file: TAbstractFile) {
