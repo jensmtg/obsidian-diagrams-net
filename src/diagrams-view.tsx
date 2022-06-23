@@ -3,7 +3,6 @@ import { DIAGRAM_VIEW_TYPE } from './constants';
 import { DiagramsApp } from './DiagramsApp';
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import * as bops from 'bops';
 
 export default class DiagramsView extends ItemView {
     filePath: string;
@@ -65,7 +64,7 @@ export default class DiagramsView extends ItemView {
 
         const saveData = (msg: any) => {
             const svgData = msg.svgMsg.data
-            const svgBuffer = bops.from(svgData.replace('data:image/svg+xml;base64,', ''), 'base64')
+            const svgBuffer = Buffer.from(svgData.replace('data:image/svg+xml;base64,', ''), 'base64')
             if (this.diagramExists) {
                 const svgFile = this.vault.getAbstractFileByPath(this.svgPath)
                 const xmlFile = this.vault.getAbstractFileByPath(this.xmlPath)

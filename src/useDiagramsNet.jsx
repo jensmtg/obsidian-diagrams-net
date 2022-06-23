@@ -27,25 +27,8 @@ function useDiagramsNet(onSaveCallback, onStopEditing, getName, getData) {
 
     /* ============== Mount and unmount ===================== */
 
-    // Mount
-    useEffect(() => {
-        // let node = document.createElement('div');
-        // node.setAttribute('id', frameId);
-        // console.log
-        // document.getElementById('root').appendChild(node);
-    }, []);
-
-    // Unmount
-    useEffect(() => () => {
-        // document.getElementById('root').removeChild(document.getElementById(frameId));
-    }, []);
-
     // Save
     useEffect(() => {
-        // console.group('save?')
-        // console.log('save1', save1)
-        // console.log('save2', save2)
-        // console.groupEnd()
         if (save1 && save2) {
             onSaveCallback({ pngMsg: save1, svgMsg: save2 })
             callStopEditing();
@@ -135,16 +118,7 @@ function useDiagramsNet(onSaveCallback, onStopEditing, getName, getData) {
         //frameRef.current.focus()
     }
 
-    // function callSave(msg) {
-    //     if (!onSaveCallback) {
-    //         console.error('No save callback given...')
-    //     }
-    //     else {
-    //         onSaveCallback(msg)
-    //     }
-    // }
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     function callStopEditing() {
         stopEditing()
     }
