@@ -1,7 +1,7 @@
 {
 	"name": "obsidian-diagrams-net",
-	"version": "1.0.1",
-	"description": "This is a diagrams.net/draw.io-plugin proof of concept for Obsidian, using an online editor.",
+	"version": "1.0.2",
+	"description": "Enable diagrams.net (previously draw.io) type diagrams, with the diagrams.net embedded editor.",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",

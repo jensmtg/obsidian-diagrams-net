@@ -1,10 +1,10 @@
 {
 	"id": "obsidian-diagrams-net",
 	"name": "Diagrams.net",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"minAppVersion": "0.12.0",
-	"description": "A plugin for Obsidian for inserting and editing diagrams.net (previously draw.io) diagrams.",
+	"description": "Enable diagrams.net (previously draw.io) type diagrams, with the diagrams.net embedded editor.",
 	"author": "Jens M Gleditsch",
 	"authorUrl": "https://github.com/jensmtg",
-	"isDesktopOnly": false
+	"isDesktopOnly": true
 }
