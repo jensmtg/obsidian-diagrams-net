@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-diagrams-net",
-	"version": "1.0.2",
+	"version": "1.0.4",
 	"description": "Enable diagrams.net (previously draw.io) type diagrams, with the diagrams.net embedded editor.",
 	"main": "main.js",
 	"scripts": {
