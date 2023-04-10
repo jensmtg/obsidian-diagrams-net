@@ -1,6 +1,9 @@
-import { addIcon, Notice, Plugin, TFile, Vault, Workspace, WorkspaceLeaf, MenuItem, MarkdownView, TAbstractFile, Menu, Editor } from 'obsidian';
+import type { Settings } from './settings';
+
+import { addIcon, Notice, Plugin, TFile, Vault, Workspace, WorkspaceLeaf, MenuItem, MarkdownView, TAbstractFile, Menu, Editor, moment } from 'obsidian';
 import { DIAGRAM_VIEW_TYPE, ICON } from './constants';
 import DiagramsView from './diagrams-view';
+import { DEFAULT_SETTINGS, DiagramsNetSettingsTab } from './settings'
 
 
 export default class DiagramsNet extends Plugin {
@@ -8,8 +11,11 @@ export default class DiagramsNet extends Plugin {
 	vault: Vault;
 	workspace: Workspace;
 	diagramsView: DiagramsView;
+	settings: Settings;
 
 	async onload() {
+
+		await this.loadSettings();
 
 		this.vault = this.app.vault;
 		this.workspace = this.app.workspace;
@@ -61,6 +67,8 @@ export default class DiagramsNet extends Plugin {
 		this.registerEvent(this.app.vault.on('rename', (file, oldname) => this.handleRenameFile(file, oldname)));
 		this.registerEvent(this.app.vault.on('delete', (file) => this.handleDeleteFile(file)));
 
+		this.addSettingTab(new DiagramsNetSettingsTab(this.app, this));
+
 	}
 
 	isFileValidDiagram(file: TAbstractFile) {
@@ -86,9 +94,43 @@ export default class DiagramsNet extends Plugin {
 		return workspace.activeLeaf?.getDisplayText();
 	}
 
+	getActiveFolderAndFileName() {
+		const filepath = this.activeLeafPath(this.workspace);
+		const lastIndex = filepath.lastIndexOf("/");
+		const activeFileName = lastIndex == -1 ? filepath : filepath.substring(lastIndex + 1);
+		return {
+			activeFolder: filepath.substring(0, lastIndex),
+			activeFileName,
+			activeFileBase: activeFileName.replace(/\.[^/.]+$/, ""),
+		};
+	}
+
 	async availablePath() {
-		// @ts-ignore: Type not documented.
-		const base = await this.vault.getAvailablePathForAttachments('Diagram', 'svg')
+		const {activeFolder, activeFileBase} = this.getActiveFolderAndFileName();
+
+		const base = this.settings.nameWithFileNameAndTimestamp
+			? `${activeFileBase}-${moment().format().replaceAll(':', '.')}.svg`
+			// @ts-ignore: Type not documented.
+			: await this.vault.getAvailablePathForAttachments('Diagram', 'svg');
+
+		if (this.settings.createUnderVaultAttachmentsFolder) {
+
+			// @ts-ignore: Type not documented.
+			const attachmentFolder = this.vault.getConfig('attachmentFolderPath');
+			// Attachment folder being './' means that the attachments need to be
+			// in the same folder as the note.
+			const fullPath = attachmentFolder === './'
+				? `${activeFolder}/${base}`
+				: `${attachmentFolder.endsWith('/')
+					? attachmentFolder
+					: attachmentFolder + '/'}${base}`;
+
+			return {
+				svgPath: fullPath,
+				xmlPath: this.getXmlPath(fullPath)
+			}
+		}
+
 		return {
 			svgPath: base,
 			xmlPath: this.getXmlPath(base)
@@ -177,6 +219,14 @@ export default class DiagramsNet extends Plugin {
 					this.attemptNewDiagram();
 				});
 		});
+	}
+
+	async loadSettings() {
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+	}
+
+	async saveSettings() {
+		await this.saveData(this.settings);
 	}
 
 	async onunload() {
