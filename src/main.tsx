@@ -109,9 +109,9 @@ export default class DiagramsNet extends Plugin {
 		const {activeFolder, activeFileBase} = this.getActiveFolderAndFileName();
 
 		const base = this.settings.nameWithFileNameAndTimestamp
-			? `${activeFileBase}-${moment().format().replaceAll(':', '.')}.svg`
+			? `${activeFileBase}-${moment().format().replaceAll(':', '.')}`
 			// @ts-ignore: Type not documented.
-			: await this.vault.getAvailablePathForAttachments('Diagram', 'svg');
+			: 'Diagram';
 
 		if (this.settings.createUnderVaultAttachmentsFolder) {
 
@@ -125,15 +125,21 @@ export default class DiagramsNet extends Plugin {
 					? attachmentFolder
 					: attachmentFolder + '/'}${base}`;
 
+			// @ts-ignore: Type not documented.
+			const availPath = await this.vault.getAvailablePathForAttachments(fullPath, 'svg');
+
 			return {
-				svgPath: fullPath,
-				xmlPath: this.getXmlPath(fullPath)
+				svgPath: availPath,
+				xmlPath: this.getXmlPath(availPath)
 			}
 		}
 
+		// @ts-ignore: Type not documented.
+		const availPath = await this.vault.getAvailablePathForAttachments(base, 'svg');
 		return {
-			svgPath: base,
-			xmlPath: this.getXmlPath(base)
+			// @ts-ignore: Type not documented.
+			svgPath: availPath,
+			xmlPath: this.getXmlPath(availPath)
 		}
 	}
 
