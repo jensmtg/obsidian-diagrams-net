@@ -1,6 +1,9 @@
-import { addIcon, Notice, Plugin, TFile, Vault, Workspace, WorkspaceLeaf, MenuItem, MarkdownView, TAbstractFile, Menu, Editor } from 'obsidian';
+import type { Settings } from './settings';
+
+import { addIcon, Notice, Plugin, TFile, Vault, Workspace, WorkspaceLeaf, MenuItem, MarkdownView, TAbstractFile, Menu, Editor, moment } from 'obsidian';
 import { DIAGRAM_VIEW_TYPE, ICON } from './constants';
 import DiagramsView from './diagrams-view';
+import { DEFAULT_SETTINGS, DiagramsNetSettingsTab } from './settings'
 
 
 export default class DiagramsNet extends Plugin {
@@ -8,8 +11,11 @@ export default class DiagramsNet extends Plugin {
 	vault: Vault;
 	workspace: Workspace;
 	diagramsView: DiagramsView;
+	settings: Settings;
 
 	async onload() {
+
+		await this.loadSettings();
 
 		this.vault = this.app.vault;
 		this.workspace = this.app.workspace;
@@ -61,6 +67,8 @@ export default class DiagramsNet extends Plugin {
 		this.registerEvent(this.app.vault.on('rename', (file, oldname) => this.handleRenameFile(file, oldname)));
 		this.registerEvent(this.app.vault.on('delete', (file) => this.handleDeleteFile(file)));
 
+		this.addSettingTab(new DiagramsNetSettingsTab(this.app, this));
+
 	}
 
 	isFileValidDiagram(file: TAbstractFile) {
@@ -87,8 +95,22 @@ export default class DiagramsNet extends Plugin {
 	}
 
 	async availablePath() {
+		const activeFile = this.workspace.getActiveFile();
+
+		// If active file is null, we are at the root folder. And of course,
+		// we won't be able to name the diagram with active file name and
+		// timestamp.
+		const fileName = activeFile !== null && this.settings.nameWithFileNameAndTimestamp
+			? `${activeFile.basename}-${moment().format().replaceAll(':', '.')}`
+			: 'Diagram';
+
 		// @ts-ignore: Type not documented.
-		const base = await this.vault.getAvailablePathForAttachments('Diagram', 'svg')
+		const base = await this.vault.getAvailablePathForAttachments(
+			fileName,
+			'svg',
+			activeFile
+		);
+
 		return {
 			svgPath: base,
 			xmlPath: this.getXmlPath(base)
@@ -179,9 +201,16 @@ export default class DiagramsNet extends Plugin {
 		});
 	}
 
+	async loadSettings() {
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+	}
+
+	async saveSettings() {
+		await this.saveData(this.settings);
+	}
+
 	async onunload() {
 	}
 
 }
-
 

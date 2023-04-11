@@ -52,8 +52,8 @@ export default class DiagramsView extends ItemView {
                 close()
             }
             else {
-                saveData(msg)
-                insertDiagram()
+                const { svgFile } = await saveData(msg)
+                insertDiagram(svgFile)
                 close()
             }
         }
@@ -62,12 +62,15 @@ export default class DiagramsView extends ItemView {
             this.workspace.detachLeavesOfType(DIAGRAM_VIEW_TYPE);
         }
 
-        const saveData = (msg: any) => {
+        const saveData = async (msg: any) => {
             const svgData = msg.svgMsg.data
             const svgBuffer = Buffer.from(svgData.replace('data:image/svg+xml;base64,', ''), 'base64')
+
+            let svgFile: TFile;
+            let xmlFile: TFile;
             if (this.diagramExists) {
-                const svgFile = this.vault.getAbstractFileByPath(this.svgPath)
-                const xmlFile = this.vault.getAbstractFileByPath(this.xmlPath)
+                svgFile = this.vault.getAbstractFileByPath(this.svgPath) as TFile
+                xmlFile = this.vault.getAbstractFileByPath(this.xmlPath) as TFile
                 if (!(svgFile instanceof TFile && xmlFile instanceof TFile)) {
                     return
                 }
@@ -75,20 +78,36 @@ export default class DiagramsView extends ItemView {
                 this.vault.modify(xmlFile, msg.svgMsg.xml)
             }
             else {
-                this.vault.createBinary(this.svgPath, svgBuffer)
-                this.vault.create(this.xmlPath, msg.svgMsg.xml)
+                svgFile = await this.vault.createBinary(this.svgPath, svgBuffer)
+                xmlFile = await this.vault.create(this.xmlPath, msg.svgMsg.xml)
+
             }
+
+            // Return the TFile objects for later usage.
+			// At this point the only use case is that `insertDiagram` needs the
+			// newly created xml TFile object. But just to make the interface
+			// clean, we return both files here, and regardless of newly created
+			// or not.
+            return {
+                svgFile,
+                xmlFile
+            };
         }
 
         const refreshMarkdownViews = async () => {
             // Haven't found a way to refresh the hostView.
         }
 
-        const insertDiagram = () => {
+        const insertDiagram = (svgFile: TFile) => {
+			// If active file is null, we are at the root folder.
+			const activeFilePath = this.workspace.getActiveFile()?.path ?? '';
+			// Build link text from the svg file to source markdown file.
+            const linkText = this.app.metadataCache.fileToLinktext(svgFile, activeFilePath);
+
             // @ts-ignore: Type not documented.
             const cursor = this.hostView.editor.getCursor();
             // @ts-ignore: Type not documented.
-            this.hostView.editor.replaceRange(`![[${this.svgPath}]]`, cursor);
+            this.hostView.editor.replaceRange(`![[${linkText}]]`, cursor);
 
         }
 
