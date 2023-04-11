@@ -24,7 +24,7 @@ export default class DiagramsView extends ItemView {
     }
 
     constructor(leaf: WorkspaceLeaf, hostView: View,
-        initialFileInfo: { path: string, basename: string, svgPath: string, xmlPath: string, diagramExists: boolean } ) {
+        initialFileInfo: { path: string, basename: string, svgPath: string, xmlPath: string, diagramExists: boolean }) {
         super(leaf);
         this.filePath = initialFileInfo.path;
         this.fileName = initialFileInfo.basename;
