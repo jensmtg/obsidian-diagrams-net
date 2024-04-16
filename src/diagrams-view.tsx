@@ -90,12 +90,10 @@ export default class DiagramsView extends Modal {
             const match = line.match(/\[\[.*?\]\]/);
             if (!match) return;
             const modifiedLine = line.replace(/\!\[\[/, '[[');
-            this.hostView.editor.replaceRange(modifiedLine, { line: cursor.line, ch: 0 }, { line: cursor.line, ch: line.length }); // 替换当前行内容
-            const newLine = '\n';
-            this.hostView.editor.replaceRange(newLine, { line: cursor.line, ch: line.length });
+            this.hostView.editor.replaceRange(modifiedLine, { line: cursor.line, ch: 0 }, { line: cursor.line, ch: line.length });
             setTimeout(() => {
-                const finalLine = modifiedLine.replace(/\[\[/, '![[');
-                this.hostView.editor.replaceRange(finalLine, { line: cursor.line, ch: 0 }, { line: cursor.line, ch: line.length }); // 恢复当前行内容
+              const finalLine = modifiedLine.replace(/\[\[/, '![[');
+              this.hostView.editor.replaceRange(finalLine, { line: cursor.line, ch: 0 }, { line: cursor.line, ch: modifiedLine.length });
             }, 200);
         }
 
