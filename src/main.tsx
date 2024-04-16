@@ -16,19 +16,6 @@ export default class DiagramsNet extends Plugin {
 
 		addIcon("diagram", ICON);
 
-		this.registerView(
-			DIAGRAM_VIEW_TYPE,
-			(leaf: WorkspaceLeaf) => (
-				this.diagramsView = new DiagramsView(
-					leaf, null, {
-					path: this.activeLeafPath(this.workspace),
-					basename: this.activeLeafName(this.workspace),
-					svgPath: '',
-					xmlPath: '',
-					diagramExists: false,
-				})
-			)
-		);
 
 		this.addCommand({
 			id: 'app:diagrams-net-new-diagram',
@@ -126,17 +113,8 @@ export default class DiagramsNet extends Plugin {
 	}
 
 	async initView(fileInfo: any) {
-		if (this.app.workspace.getLeavesOfType(DIAGRAM_VIEW_TYPE).length > 0) {
-			return
-		}
 		const hostView = this.workspace.getActiveViewOfType(MarkdownView);
-
-		const leaf = this.app.workspace.splitActiveLeaf('horizontal')
-		// TODO: Replace splitActiveLeaf with getLeaf, when official version => 0.15.
-		// const leaf = this.app.workspace.getLeaf(true, 'horizontal')
-
-		const diagramView = new DiagramsView(leaf, hostView, fileInfo)
-		leaf.open(diagramView)
+		new DiagramsView(this.app, hostView, fileInfo).open();
 	}
 
 	handleDeleteFile(file: TAbstractFile) {

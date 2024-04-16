@@ -1,10 +1,11 @@
-import { ItemView, WorkspaceLeaf, Workspace, View, Vault, TFile } from 'obsidian';
+import { App, Modal, ItemView, WorkspaceLeaf, Workspace, View, Vault, TFile } from 'obsidian';
 import { DIAGRAM_VIEW_TYPE } from './constants';
 import { DiagramsApp } from './DiagramsApp';
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-export default class DiagramsView extends ItemView {
+
+export default class DiagramsView extends Modal {
     filePath: string;
     fileName: string;
     svgPath: string;
@@ -23,9 +24,9 @@ export default class DiagramsView extends ItemView {
         return DIAGRAM_VIEW_TYPE;
     }
 
-    constructor(leaf: WorkspaceLeaf, hostView: View,
+    constructor(app: App, hostView: View,
         initialFileInfo: { path: string, basename: string, svgPath: string, xmlPath: string, diagramExists: boolean }) {
-        super(leaf);
+        super(app);
         this.filePath = initialFileInfo.path;
         this.fileName = initialFileInfo.basename;
         this.svgPath = initialFileInfo.svgPath;
@@ -60,6 +61,7 @@ export default class DiagramsView extends ItemView {
 
         const close = () => {
             this.workspace.detachLeavesOfType(DIAGRAM_VIEW_TYPE);
+            this.close();
         }
 
         const saveData = (msg: any) => {
@@ -82,6 +84,17 @@ export default class DiagramsView extends ItemView {
 
         const refreshMarkdownViews = async () => {
             // Haven't found a way to refresh the hostView.
+            // Delete the preceding image link through regular matching! and add it back in the modified content
+            const cursor = this.hostView.editor.getCursor();
+            const line = this.hostView.editor.getLine(cursor.line);
+            const match = line.match(/\[\[.*?\]\]/);
+            if (!match) return;
+            const modifiedLine = line.replace(/\!\[\[/, '[[');
+            this.hostView.editor.replaceRange(modifiedLine, { line: cursor.line, ch: 0 }, { line: cursor.line, ch: line.length });
+            setTimeout(() => {
+              const finalLine = modifiedLine.replace(/\[\[/, '![[');
+              this.hostView.editor.replaceRange(finalLine, { line: cursor.line, ch: 0 }, { line: cursor.line, ch: modifiedLine.length });
+            }, 200);
         }
 
         const insertDiagram = () => {
@@ -92,7 +105,9 @@ export default class DiagramsView extends ItemView {
 
         }
 
-        const container = this.containerEl.children[1];
+        const container = this.containerEl.lastChild;
+        container.style.width = '80%';
+        container.style.height = '80%';
 
         ReactDOM.render(
             <DiagramsApp
@@ -107,7 +122,7 @@ export default class DiagramsView extends ItemView {
     }
 
     async onClose() {
-        ReactDOM.unmountComponentAtNode(this.containerEl.children[1]);
+        ReactDOM.unmountComponentAtNode(this.containerEl.lastChild);
     }
 
 }
