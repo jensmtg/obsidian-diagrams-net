@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import ReactDOM from 'react-dom'
+import ReactDOM from 'react-dom';
 const bgColor="white"
 /**
  * - Based on: https://github.com/jgraph/drawio-integration
@@ -136,7 +136,6 @@ function useDiagramsNet(onSaveCallback, onStopEditing, getName, getData) {
             ref={frameRef}
             // sandbox="allow-scripts allow-same-origin"
             style={{
-                position: 'fixed',
                 width: '100%',
                 height: '100%',
                 left: '0',

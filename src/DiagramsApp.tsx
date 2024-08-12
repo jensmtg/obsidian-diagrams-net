@@ -42,6 +42,6 @@ export const DiagramsApp = (props: any) => {
         }
     }, [xmlData])
 
-    return <div id="drawIoDiagramFrame" />
+    return <div id="drawIoDiagramFrame" className="modal-content diagrams-modal" />;
 
 };
